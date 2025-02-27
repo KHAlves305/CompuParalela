@@ -1,0 +1,55 @@
+#include <stdio.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <time.h>
+#include <stdlib.h>  // Necessário para srand() e rand()
+
+
+int main() {
+  int pid;
+  int n; 
+
+  int status;
+  int num_processos = 0;
+
+  siginfo_t siginfo;
+  printf("Digite os n processos: ");
+  scanf("%d", &n);
+
+  int pids[n];
+  int total_processos = n;
+
+  while (num_processos < total_processos) {
+
+    pid = fork();
+
+
+    // Processo filho
+    if (pid == 0) {
+
+      srand(time(NULL)+getpid());
+      int sleep_time = rand() % 10 + 1;
+      sleep(sleep_time);
+      return sleep_time;
+
+    } else {
+      pids[num_processos] = pid;
+      num_processos++;
+
+    }
+
+  }
+
+  pid_t pid_filho;
+
+  while(num_processos !=0){
+      pid_filho = waitpid(pids[num_processos-1], &status, 0);
+      printf("No processo pai: processo filho: %d, status de saída do filho: %d", pid_filho, WEXITSTATUS(status));
+      num_processos--;
+      printf("\n");
+  }
+// 
+   return 0;  
+
+}
